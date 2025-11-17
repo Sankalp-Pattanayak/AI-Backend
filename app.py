@@ -15,15 +15,35 @@ MODEL = "gpt-4.1"
 
 def analyze_code_for_bugs(code_snippet: str) -> list:
     prompt = (
-        "You are an expert code reviewer. Examine the following code and identify "
-        "any bugs, risky patterns, or logic issues. Respond in strict JSON format "
-        "as a list of issues, where each issue has:\n"
-        "- line (integer)\n"
-        "- issue (string)\n"
-        "- suggestion (string)\n\n"
-        "Code:\n"
-        f"{code_snippet}\n\n"
-        "JSON:"
+        "You are an expert code reviewer and security analyst. Examine the following code meticulously and identify "
+        "any bugs, vulnerabilities, risky patterns, performance issues, or logic errors. Consider:\n\n"
+        "- Memory leaks and resource management issues\n"
+        "- Security vulnerabilities (SQL injection, XSS, etc.)\n"
+        "- Race conditions and concurrency issues\n"
+        "- Error handling gaps and unhandled exceptions\n"
+        "- Type safety and null reference issues\n"
+        "- Performance bottlenecks and inefficient algorithms\n"
+        "- Code style and best practices violations\n"
+        "- Off-by-one errors and boundary conditions\n"
+        "- Unused variables or dead code\n"
+        "- Logic errors and incorrect algorithms\n\n"
+        "Respond in strict JSON format as a list of issues. Each issue must have:\n"
+        "- \"line\": integer or null if unknown\n"
+        "- \"severity\": one of [\"critical\", \"high\", \"medium\", \"low\"]\n"
+        "- \"issue\": concise description of the problem\n"
+        "- \"suggestion\": specific, actionable fix with code example if possible\n\n"
+        "Code to review:\n"
+        "```\n"
+        f"{code_snippet}\n"
+        "```\n\n"
+        "Respond ONLY with valid JSON array, no additional text:"
+    )
+
+    response = client.chat.completions.create(
+        model=MODEL,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.1,
+        max_tokens=1024
     )
 
     response = client.chat.completions.create(
